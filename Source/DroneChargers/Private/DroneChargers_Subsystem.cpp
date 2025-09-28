@@ -6,14 +6,15 @@
 void ADroneChargers_Subsystem::BeginPlay()
 {
 	Super::BeginPlay();
-	SUBSCRIBE_METHOD(AFGDroneVehicle::RefuelFromDockedStation, [this](auto& scope, AFGDroneVehicle* self, float amount) {
+	if (hooksInitialized) return;
+	hookHandler_before = SUBSCRIBE_METHOD(AFGDroneVehicle::RefuelFromDockedStation, [this](auto& scope, AFGDroneVehicle* self, float amount) {
 		if (mPortChargers.Contains(self->GetDockedStation())) {
 			FInventoryStack stack;
 			self->GetDockedStation()->GetFuelInventory()->GetStackFromIndex(0, stack);
 			mQueuedRefuels.Add(self->GetDockedStation(), FItemAmount(stack.Item.GetItemClass(), stack.NumItems));
 		}
 	});
-	SUBSCRIBE_METHOD_AFTER(AFGDroneVehicle::RefuelFromDockedStation, [this](AFGDroneVehicle* self, float amount) {
+	hookHandler_after = SUBSCRIBE_METHOD_AFTER(AFGDroneVehicle::RefuelFromDockedStation, [this](AFGDroneVehicle* self, float amount) {
 		if (mPortChargers.Contains(self->GetDockedStation())) {
 			int32 itemsLeft = 0;
 			FInventoryStack stack;
@@ -24,6 +25,13 @@ void ADroneChargers_Subsystem::BeginPlay()
 			mQueuedRefuels.Remove(self->GetDockedStation());
 		}
 	});
+	hooksInitialized = true;
+}
+
+void ADroneChargers_Subsystem::EndPlay(const EEndPlayReason::Type endPlayReason)
+{
+	if (hookHandler_before.IsValid()) UNSUBSCRIBE_METHOD(AFGDroneVehicle::RefuelFromDockedStation, hookHandler_before);
+	if (hookHandler_after.IsValid()) UNSUBSCRIBE_METHOD(AFGDroneVehicle::RefuelFromDockedStation, hookHandler_after);
 }
 
 void ADroneChargers_Subsystem::RegisterPortCharger(AFGBuildableDroneStation* port, AAVRPBuildableDroneCharger* charger)

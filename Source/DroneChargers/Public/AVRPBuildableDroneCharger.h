@@ -37,11 +37,11 @@ public:
 	void OnFuelRemoved(TSubclassOf< UFGItemDescriptor > itemClass, int32 numRemoved);
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
 	UFGFactoryConnectionComponent* fuelOutputConnection;
-	UPROPERTY(SaveGame, Replicated)
+	UPROPERTY(SaveGame, Replicated, BlueprintReadOnly)
 	TSubclassOf<class UFGItemDescriptor> mCurrentBatteryClass;
-	UPROPERTY(SaveGame, Replicated)
+	UPROPERTY(SaveGame, Replicated, BlueprintReadOnly)
 	int32 mSavedBatteryAmount;
-	UPROPERTY(SaveGame, Replicated)
+	UPROPERTY(SaveGame, Replicated, BlueprintReadOnly)
 	float mCurrentRechargeProgress;
 private:
 	UPROPERTY(SaveGame)
