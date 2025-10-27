@@ -7,8 +7,19 @@
 #include "FGBuildableDroneStation.h"
 #include "DroneChargers_Subsystem.generated.h"
 
+USTRUCT()
+struct FStationFuelAmount {
+	GENERATED_BODY()
+public:
+	FStationFuelAmount();
+	FStationFuelAmount(AFGBuildableDroneStation* station, FItemAmount refuelAmount);
+	UPROPERTY()
+	AFGBuildableDroneStation* Station;
+	UPROPERTY()
+	FItemAmount RefuelAmount;
+};
 /**
- * Drone chargers subsystem - stores 
+ * Drone chargers subsystem - stores attempts of drones to refuel and resolves them
  */
 UCLASS()
 class DRONECHARGERS_API ADroneChargers_Subsystem : public AModSubsystem
@@ -26,8 +37,8 @@ protected:
 	FDelegateHandle hookHandler_before;
 	FDelegateHandle hookHandler_after;
 private:
-	UPROPERTY(SaveGame)
+	UPROPERTY()
 	TMap<AFGBuildableDroneStation*, AAVRPBuildableDroneCharger*> mPortChargers;
-	UPROPERTY(SaveGame)
-	TMap<AFGBuildableDroneStation*, FItemAmount> mQueuedRefuels;
+	UPROPERTY()
+	TMap<AFGDroneVehicle*, FStationFuelAmount> mQueuedRefuels;
 };

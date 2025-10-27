@@ -37,6 +37,7 @@ void AAVRPBuildableDroneCharger::Factory_TickProducing(float dt)
 
 void AAVRPBuildableDroneCharger::OnFuelRemoved(TSubclassOf<UFGItemDescriptor> itemClass, int32 numRemoved)
 {
+	if (!HasAuthority()) return;
 	bool isBattery = UContentTagRegistry::Get(this)->GetGameplayTagContainerFor(itemClass).HasTag(FGameplayTag::RequestGameplayTag("Item.Battery"));
 	if (isBattery) {
 		if (mCurrentBatteryClass != itemClass) {
